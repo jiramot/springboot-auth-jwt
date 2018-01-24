@@ -1,8 +1,7 @@
 package com.jiramot.auth.security;
 
-import com.jiramot.auth.user.ApplicationUser;
-import com.jiramot.auth.user.ApplicationUserRepository;
-import org.springframework.security.core.userdetails.User;
+import com.jiramot.auth.user.User;
+import com.jiramot.auth.user.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -12,18 +11,18 @@ import static java.util.Collections.emptyList;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
-  private ApplicationUserRepository applicationUserRepository;
+  private UserRepository userRepository;
 
-  public UserDetailsServiceImpl(ApplicationUserRepository applicationUserRepository) {
-    this.applicationUserRepository = applicationUserRepository;
+  public UserDetailsServiceImpl(UserRepository userRepository) {
+    this.userRepository = userRepository;
   }
 
   @Override
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-    ApplicationUser applicationUser = applicationUserRepository.findByUsername(username);
+    User applicationUser = userRepository.findByUsername(username);
     if (applicationUser == null) {
       throw new UsernameNotFoundException(username);
     }
-    return new User(applicationUser.getUsername(), applicationUser.getPassword(), emptyList());
+    return new org.springframework.security.core.userdetails.User(applicationUser.getUsername(), applicationUser.getPassword(), emptyList());
   }
 }

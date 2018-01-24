@@ -4,5 +4,7 @@ public class SecurityConstants {
   static final String LOGIN_URL = "/login";
   static final String SIGN_UP_URL = "/signup";
   static final String SECRET = "SECRET";
-  static final long EXPIRATIONTIME = 864_000_000; // 10 days
+  static final long EXPIRATION_TIME_IN_MINUTE = 15;
+  static final long REFRESH_TIME_IN_MINUTE = 60 * 24 * 30;
+  static final String ISSUEER = "AUTH";
 }

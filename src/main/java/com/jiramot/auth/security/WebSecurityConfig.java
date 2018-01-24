@@ -1,14 +1,18 @@
 package com.jiramot.auth.security;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import java.util.Arrays;
+import java.util.List;
 
 import static com.jiramot.auth.security.SecurityConstants.LOGIN_URL;
 import static com.jiramot.auth.security.SecurityConstants.SIGN_UP_URL;
@@ -17,24 +21,30 @@ import static com.jiramot.auth.security.SecurityConstants.SIGN_UP_URL;
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
+  @Autowired
   private UserDetailsService userDetailsService;
+  @Autowired
   private BCryptPasswordEncoder bCryptPasswordEncoder;
-
-  public WebSecurityConfig(UserDetailsService userDetailsService, BCryptPasswordEncoder bCryptPasswordEncoder) {
-    this.userDetailsService = userDetailsService;
-    this.bCryptPasswordEncoder = bCryptPasswordEncoder;
-  }
 
   @Override
   protected void configure(HttpSecurity http) throws Exception {
-    http.csrf().disable().authorizeRequests()
-        .antMatchers(HttpMethod.POST, LOGIN_URL).permitAll()
-        .antMatchers(HttpMethod.POST, SIGN_UP_URL).permitAll()
+    List<String> permitAllEndpointList = Arrays.asList(
+        LOGIN_URL,
+        SIGN_UP_URL
+    );
+
+    http.csrf().disable()
+        .sessionManagement()
+        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+        .and()
+        .authorizeRequests()
+        .antMatchers(permitAllEndpointList.toArray(new String[permitAllEndpointList.size()]))
+        .permitAll()
         .anyRequest().authenticated()
         .and()
-        .addFilterBefore(new JWTLoginFilter(LOGIN_URL, authenticationManager()),
+        .addFilterBefore(new JwtLoginFilter(LOGIN_URL, authenticationManager()),
             UsernamePasswordAuthenticationFilter.class)
-        .addFilterBefore(new JWTAuthenticationFilter(),
+        .addFilterBefore(new JwtAuthenticationFilter(),
             UsernamePasswordAuthenticationFilter.class);
 
   }

@@ -1,13 +1,11 @@
 package com.jiramot.auth.user;
 
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
-@Entity
-public class ApplicationUser {
+@Entity(name = "User")
+@Table(name = "application_user")
+public class User {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
