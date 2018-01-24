@@ -3,7 +3,7 @@ package com.jiramot.auth.security;
 import lombok.Data;
 
 @Data
-public class AccountCredentials {
+public class LoginRequest {
   private String username;
   private String password;
 }
