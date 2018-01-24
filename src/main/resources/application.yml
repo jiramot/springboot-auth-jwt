@@ -1,0 +1,24 @@
+endpoints:
+  actuator:
+    sensitive: false
+
+spring:
+  application:
+    name: auth
+
+  datasource:
+    url: ${MYSQL_URL:jdbc:mysql://localhost/auth?useSSL=false&characterEncoding=UTF-8}
+    username: ${MYSQL_USERNAME:root}
+    password: ${MYSQL_PASSWORD:}
+    driver-class-name: com.mysql.jdbc.Driver
+    testWhileIdle: true
+    validationQuery: SELECT 1
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+      naming-strategy: org.hibernate.cfg.ImprovedNamingStrategy
+    database-platform: org.hibernate.dialect.MySQLDialect
+    generate-ddl: true
+    show-sql: true
+
