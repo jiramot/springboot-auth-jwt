@@ -7,7 +7,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -21,9 +20,9 @@ import static com.jiramot.auth.security.SecurityConstants.*;
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
   @Autowired
-  private UserDetailsService userDetailsService;
-  @Autowired
   private BCryptPasswordEncoder bCryptPasswordEncoder;
+  @Autowired
+  private JwtAuthenticationProvider authenticationProvider;
 
   @Override
   protected void configure(HttpSecurity http) throws Exception {
@@ -51,7 +50,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
   @Override
   protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-    auth.userDetailsService(userDetailsService).passwordEncoder(bCryptPasswordEncoder);
+    auth.authenticationProvider(authenticationProvider);
 
   }
 }
