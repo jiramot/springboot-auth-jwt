@@ -8,6 +8,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.util.Arrays;
@@ -23,6 +24,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
   private BCryptPasswordEncoder bCryptPasswordEncoder;
   @Autowired
   private JwtAuthenticationProvider authenticationProvider;
+  @Autowired
+  private AuthenticationFailureHandler failureHandler;
 
   @Override
   protected void configure(HttpSecurity http) throws Exception {
@@ -43,9 +46,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         .and()
         .addFilterBefore(new JwtLoginFilter(LOGIN_URL, authenticationManager()),
             UsernamePasswordAuthenticationFilter.class)
-        .addFilterBefore(new JwtAuthenticationFilter(),
+        .addFilterBefore(createJwtAuthenticationFilter(permitAllEndpointList, "/**"),
             UsernamePasswordAuthenticationFilter.class);
 
+  }
+
+  JwtAuthenticationFilter createJwtAuthenticationFilter(List<String> pathsToSkip, String pattern) {
+    SkipPathRequestMatcher matcher = new SkipPathRequestMatcher(pathsToSkip, pattern);
+    return new JwtAuthenticationFilter(matcher, failureHandler);
   }
 
   @Override
