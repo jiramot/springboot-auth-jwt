@@ -1,5 +1,6 @@
 package com.jiramot.auth.controller;
 
+import com.jiramot.auth.security.TokenResponse;
 import com.jiramot.auth.security.WebSecurityConfig;
 import com.jiramot.auth.security.auth.jwt.JwtHeaderTokenExtractor;
 import com.jiramot.auth.security.auth.jwt.TokenVerifier;
@@ -10,7 +11,7 @@ import com.jiramot.auth.security.model.token.JwtToken;
 import com.jiramot.auth.security.model.token.JwtTokenFactory;
 import com.jiramot.auth.security.model.token.RawAccessJwtToken;
 import com.jiramot.auth.security.model.token.RefreshToken;
-import com.jiramot.auth.user.User;
+import com.jiramot.auth.user.model.User;
 import com.jiramot.auth.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -27,7 +28,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -51,7 +51,7 @@ public class RefreshTokenController {
 
   @RequestMapping(value = "/refresh", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE})
   public @ResponseBody
-  JwtToken refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+  TokenResponse refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
     String tokenPayload = tokenExtractor.extract(request.getHeader(WebSecurityConfig.AUTHENTICATION_HEADER_NAME));
 
     RawAccessJwtToken rawToken = new RawAccessJwtToken(tokenPayload);
@@ -65,13 +65,15 @@ public class RefreshTokenController {
     String subject = refreshToken.getSubject();
     User user = userService.findByUsername(subject).orElseThrow(() -> new UsernameNotFoundException("User not found: " + subject));
 
-//    if (user.getRoles() == null) throw new InsufficientAuthenticationException("User has no roles assigned");
-//    List<GrantedAuthority> authorities = user.getRoles().stream()
-//        .map(authority -> new SimpleGrantedAuthority(authority))
-//        .collect(Collectors.toList());
-    List<GrantedAuthority> authorities = Arrays.asList(new SimpleGrantedAuthority("READ"));
-    UserContext userContext = UserContext.create(user.getUsername(), authorities);
+    if (user.getRoles() == null) throw new InsufficientAuthenticationException("User has no roles assigned");
+    List<GrantedAuthority> authorities = user.getRoles().stream()
+        .map(authority -> new SimpleGrantedAuthority(authority))
+        .collect(Collectors.toList());
+    UserContext userContext = UserContext.create(user.getUsername(), user.getUuid(), authorities);
 
-    return tokenFactory.createAccessJwtToken(userContext);
+    JwtToken accessJwtToken = tokenFactory.createAccessJwtToken(userContext);
+    JwtToken refreshJwtToken = tokenFactory.createRefreshToken(userContext);
+
+    return new TokenResponse(accessJwtToken.getToken(), refreshJwtToken.getToken());
   }
 }

@@ -1,6 +1,7 @@
 package com.jiramot.auth.security.auth.username;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jiramot.auth.security.TokenResponse;
 import com.jiramot.auth.security.model.UserContext;
 import com.jiramot.auth.security.model.token.JwtToken;
 import com.jiramot.auth.security.model.token.JwtTokenFactory;
@@ -17,8 +18,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 @Component
 public class UsernameAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
@@ -39,13 +38,11 @@ public class UsernameAuthenticationSuccessHandler implements AuthenticationSucce
     JwtToken accessJwtToken = tokenFactory.createAccessJwtToken(userContext);
     JwtToken refreshJwtToken = tokenFactory.createRefreshToken(userContext);
 
-    Map<String, String> tokenMap = new HashMap<String, String>();
-    tokenMap.put("access_token", accessJwtToken.getToken());
-    tokenMap.put("refresh_token", refreshJwtToken.getToken());
+    TokenResponse tokenResponse = new TokenResponse(accessJwtToken.getToken(), refreshJwtToken.getToken());
 
     response.setStatus(HttpStatus.OK.value());
     response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-    mapper.writeValue(response.getWriter(), tokenMap);
+    mapper.writeValue(response.getWriter(), tokenResponse);
 
     clearAuthenticationAttributes(request);
   }

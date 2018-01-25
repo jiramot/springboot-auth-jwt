@@ -1,9 +1,13 @@
 package com.jiramot.auth.user;
 
+import com.jiramot.auth.user.model.User;
+import com.jiramot.auth.user.model.UserResponseDto;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.UUID;
 
 @RestController
 public class UserController {
@@ -18,8 +22,10 @@ public class UserController {
   }
 
   @PostMapping("/signup")
-  public void signUp(@RequestBody User user) {
+  public UserResponseDto signup(@RequestBody User user) {
     user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+    user.setUuid(UUID.randomUUID().toString());
     applicationUserRepository.save(user);
+    return new UserResponseDto(user);
   }
 }
