@@ -1,27 +1,34 @@
-package com.jiramot.auth.security;
+package com.jiramot.auth.security.auth.username;
 
+import com.jiramot.auth.security.model.UserContext;
 import com.jiramot.auth.user.User;
 import com.jiramot.auth.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
-public class JwtAuthenticationProvider implements AuthenticationProvider {
+public class UsernameAuthenticationProvider implements AuthenticationProvider {
 
   private UserService userService;
   private BCryptPasswordEncoder encoder;
 
   @Autowired
-  public JwtAuthenticationProvider(UserService userService, BCryptPasswordEncoder encoder) {
+  public UsernameAuthenticationProvider(UserService userService, BCryptPasswordEncoder encoder) {
     this.userService = userService;
     this.encoder = encoder;
   }
@@ -35,7 +42,13 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
     if (!encoder.matches(password, user.getPassword())) {
       throw new BadCredentialsException("Authentication Failed. Username or Password not valid.");
     }
-    return new UsernamePasswordAuthenticationToken(username, password, Collections.emptyList());
+//    if (user.getRoles() == null) throw new InsufficientAuthenticationException("User has no roles assigned");
+//    List<GrantedAuthority> authorities = user.getRoles().stream()
+//        .map(authority -> new SimpleGrantedAuthority(authority))
+//        .collect(Collectors.toList());
+    List<GrantedAuthority> authorities = Arrays.asList(new SimpleGrantedAuthority("READ"));
+    UserContext userContext = UserContext.create(user.getUsername(), authorities);
+    return new UsernamePasswordAuthenticationToken(userContext, null, userContext.getAuthorities());
   }
 
   @Override

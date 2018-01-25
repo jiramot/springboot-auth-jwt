@@ -1,9 +1,8 @@
-package com.jiramot.auth.security;
+package com.jiramot.auth.security.auth.jwt;
 
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.OrRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
-import org.springframework.util.Assert;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -14,7 +13,6 @@ public class SkipPathRequestMatcher implements RequestMatcher {
   private RequestMatcher processingMatcher;
 
   public SkipPathRequestMatcher(List<String> pathsToSkip, String processingPath) {
-    Assert.notNull(pathsToSkip);
     List<RequestMatcher> m = pathsToSkip.stream().map(path -> new AntPathRequestMatcher(path)).collect(Collectors.toList());
     matchers = new OrRequestMatcher(m);
     processingMatcher = new AntPathRequestMatcher(processingPath);

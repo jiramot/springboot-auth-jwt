@@ -1,6 +1,8 @@
-package com.jiramot.auth.security;
+package com.jiramot.auth.security.auth.jwt;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import com.jiramot.auth.security.auth.JwtAuthenticationToken;
+import com.jiramot.auth.security.WebSecurityConfig;
+import com.jiramot.auth.security.model.token.RawAccessJwtToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContext;
@@ -15,18 +17,21 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
+public class JwtTokenAuthenticationProcessingFilter extends AbstractAuthenticationProcessingFilter {
   private final AuthenticationFailureHandler failureHandler;
+  private final JwtHeaderTokenExtractor tokenExtractor;
 
-  public JwtAuthenticationFilter(RequestMatcher requiresAuthenticationRequestMatcher, AuthenticationFailureHandler failureHandler) {
+  public JwtTokenAuthenticationProcessingFilter(RequestMatcher requiresAuthenticationRequestMatcher, AuthenticationFailureHandler failureHandler, JwtHeaderTokenExtractor tokenExtractor) {
     super(requiresAuthenticationRequestMatcher);
     this.failureHandler = failureHandler;
+    this.tokenExtractor = tokenExtractor;
   }
 
   @Override
   public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException, IOException, ServletException {
-    Authentication authentication = TokenAuthenticationService.getAuthentication((HttpServletRequest) request);
-    return authentication;
+    String tokenPayload = request.getHeader(WebSecurityConfig.AUTHENTICATION_HEADER_NAME);
+    RawAccessJwtToken token = new RawAccessJwtToken(tokenExtractor.extract(tokenPayload));
+    return getAuthenticationManager().authenticate(new JwtAuthenticationToken(token));
   }
 
   @Override
