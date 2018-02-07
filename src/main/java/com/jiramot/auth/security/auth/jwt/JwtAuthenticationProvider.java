@@ -39,7 +39,7 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
         .map(SimpleGrantedAuthority::new)
         .collect(Collectors.toList());
 
-    UserContext context = UserContext.create(subject, uuid, authorities);
+    UserContext context = UserContext.create(subject, authorities);
 
     return new JwtAuthenticationToken(context, context.getAuthorities());
   }

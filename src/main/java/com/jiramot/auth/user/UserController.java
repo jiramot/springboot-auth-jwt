@@ -24,7 +24,6 @@ public class UserController {
   @PostMapping("/signup")
   public UserResponseDto signup(@RequestBody User user) {
     user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-    user.setUuid(UUID.randomUUID().toString());
     applicationUserRepository.save(user);
     return new UserResponseDto(user);
   }

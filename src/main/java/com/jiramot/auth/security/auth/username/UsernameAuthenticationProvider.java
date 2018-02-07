@@ -44,7 +44,7 @@ public class UsernameAuthenticationProvider implements AuthenticationProvider {
     List<GrantedAuthority> authorities = user.getRoles().stream()
         .map(authority -> new SimpleGrantedAuthority(authority))
         .collect(Collectors.toList());
-    UserContext userContext = UserContext.create(user.getUsername(), user.getUuid(), authorities);
+    UserContext userContext = UserContext.create(user.getUsername(), authorities);
     return new UsernamePasswordAuthenticationToken(userContext, null, userContext.getAuthorities());
   }
 

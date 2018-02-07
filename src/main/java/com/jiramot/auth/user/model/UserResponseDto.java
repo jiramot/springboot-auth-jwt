@@ -6,10 +6,11 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class UserResponseDto {
-  private String uuid;
+  private Long id;
+
 
 
   public UserResponseDto(User user) {
-    this.uuid = user.getUuid();
+    this.id = user.getId();
   }
 }

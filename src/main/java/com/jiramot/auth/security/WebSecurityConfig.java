@@ -56,7 +56,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     List<String> permitAllEndpointList = Arrays.asList(
         LOGIN_URL,
         SIGN_UP_URL,
-        REFRESH_TOKEN_URL
+        REFRESH_TOKEN_URL,
+        "/v2/api-docs", "/configuration/ui", "/swagger-resources", "/configuration/security",
+        "/swagger-ui.html", "/webjars/**", "/swagger-resources/configuration/ui", "/swagger-ui.html",
+        "/swagger-resources/configuration/security"
     );
 
     http.csrf().disable()
