@@ -11,8 +11,8 @@ import com.jiramot.auth.security.model.token.JwtToken;
 import com.jiramot.auth.security.model.token.JwtTokenFactory;
 import com.jiramot.auth.security.model.token.RawAccessJwtToken;
 import com.jiramot.auth.security.model.token.RefreshToken;
-import com.jiramot.auth.user.model.User;
-import com.jiramot.auth.user.UserService;
+import com.jiramot.auth.user.entity.User;
+import com.jiramot.auth.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
@@ -66,8 +66,9 @@ public class RefreshTokenController {
     User user = userService.findByUsername(subject).orElseThrow(() -> new UsernameNotFoundException("User not found: " + subject));
 
     if (user.getRoles() == null) throw new InsufficientAuthenticationException("User has no roles assigned");
-    List<GrantedAuthority> authorities = user.getRoles().stream()
-        .map(authority -> new SimpleGrantedAuthority(authority))
+    List<GrantedAuthority> authorities = user.getRoles().stream().flatMap(role -> role.getPermissions().stream())
+        .map(permission -> new SimpleGrantedAuthority(permission.getName()))
+        .distinct()
         .collect(Collectors.toList());
     UserContext userContext = UserContext.create(user.getUsername(), authorities);
 

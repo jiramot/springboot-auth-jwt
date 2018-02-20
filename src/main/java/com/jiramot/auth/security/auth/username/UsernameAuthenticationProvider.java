@@ -1,8 +1,8 @@
 package com.jiramot.auth.security.auth.username;
 
 import com.jiramot.auth.security.model.UserContext;
-import com.jiramot.auth.user.model.User;
-import com.jiramot.auth.user.UserService;
+import com.jiramot.auth.user.entity.User;
+import com.jiramot.auth.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -41,8 +41,9 @@ public class UsernameAuthenticationProvider implements AuthenticationProvider {
       throw new BadCredentialsException("Authentication Failed. Username or Password not valid.");
     }
     if (user.getRoles() == null) throw new InsufficientAuthenticationException("User has no roles assigned");
-    List<GrantedAuthority> authorities = user.getRoles().stream()
-        .map(authority -> new SimpleGrantedAuthority(authority))
+    List<GrantedAuthority> authorities = user.getRoles().stream().flatMap(role -> role.getPermissions().stream())
+        .map(permission -> new SimpleGrantedAuthority(permission.getName()))
+        .distinct()
         .collect(Collectors.toList());
     UserContext userContext = UserContext.create(user.getUsername(), authorities);
     return new UsernamePasswordAuthenticationToken(userContext, null, userContext.getAuthorities());

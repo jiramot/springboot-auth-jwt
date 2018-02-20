@@ -1,6 +1,6 @@
-package com.jiramot.auth.user;
+package com.jiramot.auth.user.repository;
 
-import com.jiramot.auth.user.model.User;
+import com.jiramot.auth.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

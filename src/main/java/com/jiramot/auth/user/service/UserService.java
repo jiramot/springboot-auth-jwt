@@ -1,6 +1,7 @@
-package com.jiramot.auth.user;
+package com.jiramot.auth.user.service;
 
-import com.jiramot.auth.user.model.User;
+import com.jiramot.auth.user.entity.User;
+import com.jiramot.auth.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

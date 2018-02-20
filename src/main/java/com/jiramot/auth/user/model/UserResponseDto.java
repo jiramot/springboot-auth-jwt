@@ -1,5 +1,6 @@
 package com.jiramot.auth.user.model;
 
+import com.jiramot.auth.user.entity.User;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
