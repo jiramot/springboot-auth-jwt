@@ -7,7 +7,7 @@ spring:
     name: auth
 
   datasource:
-    url: ${MYSQL_URL:jdbc:mysql://localhost/auth?useSSL=false&characterEncoding=UTF-8}
+    url: ${MYSQL_URL:jdbc:mysql://localhost/lender-auth?useSSL=false&characterEncoding=UTF-8}
     username: ${MYSQL_USERNAME:root}
     password: ${MYSQL_PASSWORD:}
     driver-class-name: com.mysql.jdbc.Driver
